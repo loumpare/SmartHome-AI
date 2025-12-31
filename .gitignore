@@ -3,3 +3,4 @@ credentials.json
 __pycache__/
 .env
 .venv/
+lc-academy-env/

@@ -17,7 +17,7 @@ from googleapiclient.discovery import build # pyright: ignore[reportMissingImpor
 # Local hardware bridge import
 # In production, 'bridge' replaces the French 'pont'
 
-from .domotics import bridge # pyright: ignore[reportMissingImports]
+from .Domotics import Bridge_hue # pyright: ignore[reportMissingImports]
 
 # --- NEWS SERVICES CONFIGURATION ---
 # Anonymized dictionary of RSS feeds
@@ -151,20 +151,44 @@ def control_lights(location: str, action: str):
 # --- WEATHER TOOLS ---
 
 @tool
-def get_weather_forecast():
-    """Fetches current weather and daily highs/lows for the configured coordinates."""
-    # Coordinates should ideally be moved to an .env file
-    lat = os.getenv("HOME_LAT", "45.1839")
-    lon = os.getenv("HOME_LON", "5.7089")
+def get_weather_forecast(location: str = None):
+    """
+    Fetches the weather forecast. 
+    If a location (city name) is provided, it fetches weather for that city.
+    Otherwise, it uses the default home coordinates.
+    """
+    # 1. Déterminer les coordonnées
+    if location and location.strip():
+        # Géocodage : Traduire le nom de la ville en coordonnées
+        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={location}&count=1&language=fr&format=json"
+        try:
+            geo_res = requests.get(geo_url).json()
+            if "results" in geo_res:
+                lat = geo_res["results"][0]["latitude"]
+                lon = geo_res["results"][0]["longitude"]
+                city_name = geo_res["results"][0]["name"]
+            else:
+                return f"Désolé, je ne trouve pas la ville de {location}."
+        except Exception as e:
+            return f"Erreur de géocodage : {str(e)}"
+    else:
+        # Par défaut : Coordonnées du domicile (.env)
+        lat = os.getenv("HOME_LAT", "45.1839")
+        lon = os.getenv("HOME_LON", "5.7089")
+        city_name = "votre domicile"
+
+    # 2. Appel de l'API Météo avec les coordonnées trouvées
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto"
     
     try:
         response = requests.get(url)
         data = response.json()
         result = {
+            "location_found": city_name,
             "current": data['current_weather']['temperature'],
             "min": data['daily']['temperature_2m_min'][0],
-            "max": data['daily']['temperature_2m_max'][0]
+            "max": data['daily']['temperature_2m_max'][0],
+            "unit": "°C"
         }
         return json.dumps(result)
     except Exception as e:
