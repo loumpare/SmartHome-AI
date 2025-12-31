@@ -13,17 +13,19 @@ Smart Lighting: Controls Philips Hue systems (via phue library).
 Docker Ready: Fully containerized for easy deployment on a home server or Raspberry Pi.
 
 🏗️ Project Structure
-Plaintext
 
-├── app/
-│   ├── main.py          # FastAPI application & Agent routing
-│   ├── tools.py         # Hardware & API tools (News, Google, Weather)
-│   ├── agents.py        # SmartAgent class definition
-│   └── domotics.py      # Hardware bridge configuration (e.g., Philips Hue)
-├── dashboard.py         # Streamlit User Interface
+```
+├── Src/
+│   ├── Main.py          # FastAPI application & Agent routing
+│   ├── Tools.py         # Hardware & API tools (News, Google, Weather)
+│   ├── Agents.py        # SmartAgent class definition
+│   └── Domotics.py      # Hardware bridge configuration (e.g., Philips Hue)
+├── Dashboard.py         # Streamlit User Interface
 ├── Dockerfile           # Backend container config
 ├── requirements.txt     # Python dependencies
 └── .env.example         # Template for environment variables
+```
+
 🚀 Quick Start
 1. Prerequisites
 Docker & Docker Compose installed.
@@ -33,8 +35,7 @@ A running LLM Server (like LM Studio, Ollama, or LocalAI) compatible with the Op
 2. Setup Environment Variables
 Create a .env file in the root directory:
 
-Extrait de code
-
+```env
 # LLM Configuration
 LLM_URL=http://your-server-ip:1234/v1
 
@@ -45,6 +46,8 @@ HOME_LON=2.29
 
 # UI Configuration
 BACKEND_API_URL=http://backend:8000/ask-agent
+```
+
 3. Google API Setup (Optional)
 To use Calendar and Gmail features:
 
@@ -57,16 +60,17 @@ Create OAuth 2.0 Credentials and download the credentials.json file to the proje
 On first run, a token.json will be generated after you authorize the app in your browser.
 
 4. Run with Docker
-Bash
-
+```bash
 docker build -t smarthome-backend .
 docker run -p 8000:8000 --env-file .env smarthome-backend
+```
+
 🛠️ Customization
 Adding News Sources
-You can modify the NEWS_FEEDS dictionary in app/tools.py to add your favorite RSS feeds.
+You can modify the NEWS_FEEDS dictionary in Src/Tools.py to add your favorite RSS feeds.
 
 Modifying Agent Behavior
-The system prompts for each agent (Router, Analyst, etc.) are located in app/main.py. You can tweak these to change the personality or strictness of the assistant.
+The system prompts for each agent (Router, Analyst, etc.) are located in Src/Main.py. You can tweak these to change the personality or strictness of the assistant.
 
 🛡️ Privacy & Security
 Anonymization: This repository contains no hardcoded IP addresses or API keys. All sensitive data is handled via .env files.
